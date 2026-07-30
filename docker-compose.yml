@@ -1,5 +1,4 @@
 services:
-
   pangolin:
     image: fosrl/pangolin:1.21.0
     container_name: pangolin
@@ -12,7 +11,11 @@ services:
       - ./config:/app/config
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3001/api/v1/
       interval: 30s
       timeout: 5s
       retries: 5
@@ -45,26 +48,21 @@ services:
       - "443:443"
 
   traefik:
-    image: traefik:v3.6
-
+    image: traefik:v3.3.3
     container_name: traefik
-
     restart: unless-stopped
+
+    network_mode: service:gerbil
 
     depends_on:
       pangolin:
         condition: service_healthy
 
-    network_mode: service:gerbil
-
-    security_opt:
-      - no-new-privileges:true
-
     command:
-      - --configFile=/etc/traefik/traefik_config.yaml
+      - --configFile=/etc/traefik/traefik_config.yml
 
-    env_file:
-      - .env
+    environment:
+      CLOUDFLARE_DNS_API_TOKEN: "your-token"
 
     volumes:
       - ./config/traefik:/etc/traefik:ro

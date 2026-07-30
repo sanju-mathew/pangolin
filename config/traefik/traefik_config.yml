@@ -1,13 +1,15 @@
 api:
-  insecure: true
   dashboard: true
+  insecure: false
 
 providers:
   http:
     endpoint: "http://pangolin:3001/api/v1/traefik-config"
     pollInterval: "5s"
+
   file:
     filename: "/etc/traefik/dynamic_config.yml"
+    watch: true
 
 experimental:
   plugins:
@@ -22,16 +24,17 @@ log:
 certificatesResolvers:
   letsencrypt:
     acme:
-      dnsChallenge:
-        provider: "cloudflare" # your DNS provider
-        # see https://doc.traefik.io/traefik/https/acme/#providers
-      email: "youremail"
+      email: "admin@example.com"
       storage: "/letsencrypt/acme.json"
       caServer: "https://acme-v02.api.letsencrypt.org/directory"
+
+      dnsChallenge:
+        provider: "cloudflare"
 
 entryPoints:
   web:
     address: ":80"
+
   websecure:
     address: ":443"
     transport:
